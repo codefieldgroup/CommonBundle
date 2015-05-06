@@ -13,17 +13,19 @@ class MiscellaneousListener
      *
      * @return array|null
      */
-    static public function mergeArray($new, &$old, $infinite = false){
-        if(count($new) > 0 && is_array($new)){
-            foreach ($new as $key => $value){
-                if (is_array($old[ $key ]) && is_array($old) && $infinite){
-                    self::merge_array_new_intro_old($value, $old[ $key ]);
-                }else{
-                    $old[ $key ] = $value;
+    static public function mergeArray( $new, &$old, $infinite = false )
+    {
+        if (count( $new ) > 0 && is_array( $new )) {
+            foreach ($new as $key => $value) {
+                if (is_array( $old[$key] ) && is_array( $old ) && $infinite) {
+                    self::merge_array_new_intro_old( $value, $old[$key] );
+                } else {
+                    $old[$key] = $value;
                 }
             }
+
             return $old;
-        }else{
+        } else {
             return null;
         }
     }
@@ -37,25 +39,25 @@ class MiscellaneousListener
      *
      * @return mixed
      */
-    static public function bindParameters(&$object, $arguments)
+    static public function bindParameters( &$object, $arguments )
     {
-        if (is_array($arguments) && count($arguments) > 0) {
+        if (is_array( $arguments ) && count( $arguments ) > 0) {
             foreach ($arguments as $property => $argument) {
-                $local_function = sprintf('set%s', Inflector::camelize($property));
-                if (method_exists($object, $local_function)) {
-                    $object->$local_function($argument);
+                $local_function = sprintf( 'set%s', Inflector::camelize( $property ) );
+                if (method_exists( $object, $local_function )) {
+                    $object->$local_function( $argument );
                     continue;
                 }
 
-                $local_function = sprintf('set%s', ucwords($property));
-                if (method_exists($object, $local_function)) {
-                    $object->$local_function($argument);
+                $local_function = sprintf( 'set%s', ucwords( $property ) );
+                if (method_exists( $object, $local_function )) {
+                    $object->$local_function( $argument );
                     continue;
                 }
 
-                $local_function = sprintf('set%s', $property);
-                if (method_exists($object, $local_function)) {
-                    $object->$local_function($argument);
+                $local_function = sprintf( 'set%s', $property );
+                if (method_exists( $object, $local_function )) {
+                    $object->$local_function( $argument );
                     continue;
                 }
 
