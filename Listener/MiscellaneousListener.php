@@ -1,5 +1,5 @@
 <?php
-namespace cf\CommonBundle\Listener;
+namespace Cf\CommonBundle\Listener;
 
 use Symfony\Component\Security\Core\SecurityContext;
 use \Doctrine\Common\Util\Inflector as Inflector;

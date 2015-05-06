@@ -3,16 +3,16 @@ parameters:
 
 services:
     cf.commonbundle.messenger:
-        class: cf\CommonBundle\Listener\MessengerListener
+        class: Cf\CommonBundle\Listener\MessengerListener
         calls:
             - [ getError, [ @? ] ]
             - [ getSuccess, [ @? ] ]
             - [ getParseErrorsByValidator, [ @? ] ]
 
     cf.commonbundle.miscellaneous:
-        class: cf\CommonBundle\Listener\MiscellaneousListener
+        class: Cf\CommonBundle\Listener\MiscellaneousListener
         calls:
             - [ bindParameters, [ @?, @? ] ]
 
     cf.commonbundle.restapi:
-        class: cf\CommonBundle\Listener\RestApiListener
+        class: Cf\CommonBundle\Listener\RestApiListener

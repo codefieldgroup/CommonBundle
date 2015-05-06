@@ -1,5 +1,5 @@
 <?php
-namespace cf\CommonBundle\Entity;
+namespace Cf\CommonBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;

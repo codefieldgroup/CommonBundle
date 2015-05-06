@@ -1,6 +1,6 @@
 <?php
 
-namespace cf\CommonBundle;
+namespace Cf\CommonBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

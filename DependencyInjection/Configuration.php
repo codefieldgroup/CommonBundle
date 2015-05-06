@@ -1,6 +1,6 @@
 <?php
 
-namespace cf\CommonBundle\DependencyInjection;
+namespace Cf\CommonBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;

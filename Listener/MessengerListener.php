@@ -1,6 +1,6 @@
 <?php
 
-namespace cf\CommonBundle\Listener;
+namespace Cf\CommonBundle\Listener;
 
 
 class MessengerListener{
