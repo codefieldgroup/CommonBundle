@@ -1,0 +1,18 @@
+parameters:
+#    cf_user.example.class: cf\UserBundle\Example
+
+services:
+    cf.commonbundle.messenger:
+        class: cf\CommonBundle\Listener\MessengerListener
+        calls:
+            - [ getError, [ @? ] ]
+            - [ getSuccess, [ @? ] ]
+            - [ getParseErrorsByValidator, [ @? ] ]
+
+    cf.commonbundle.miscellaneous:
+        class: cf\CommonBundle\Listener\MiscellaneousListener
+        calls:
+            - [ bindParameters, [ @?, @? ] ]
+
+    cf.commonbundle.restapi:
+        class: cf\CommonBundle\Listener\RestApiListener
