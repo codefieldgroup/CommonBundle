@@ -1,0 +1,30 @@
+{
+    "name" : "cf/commonbundle",
+    "description" : "A common bundle",
+    "type" : "symfony-bundle",
+    "authors" : [{
+        "name" : "Jose Carlos Ramos Carmenates",
+        "email" : "jramoscarmenates@gmail.com"
+    }],
+    "keywords" : [
+        "cf common bundle"
+    ],
+    "license" : [
+        "MIT"
+    ],
+    "require" : {
+    },
+    "autoload" : {
+        "psr-0" : {
+            "Cf\\CommonBundle" : ""
+        }
+    },
+    "target-dir" : "Cf/CommonBundle",
+    "repositories" : [{
+    }],
+    "extra" : {
+    "branch-alias" : {
+            "dev-master" : "1.0.0"
+        }
+    }
+}
