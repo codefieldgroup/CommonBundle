@@ -1,5 +1,5 @@
 {
-    "name" : "cf/commonbundle",
+    "name" : "cf/CommonBundle",
     "description" : "A common bundle",
     "type" : "symfony-bundle",
     "authors" : [{
