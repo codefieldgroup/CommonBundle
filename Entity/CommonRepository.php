@@ -156,10 +156,10 @@ class CommonRepository extends EntityRepository
                         $join_name[$join[0]] = $join[0];
                         $qb_count->join( 'entity.'.$join[0], $join[0] );
                     }
-                    $qb_count = $qb_count->orWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
+                    $qb_count = $qb_count->andWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
                     $qb_count->setParameter( 'value'.$join[1], '%'.$value.'%' );
                 } else {
-                    $qb_count = $qb_count->orWhere( 'entity.'.$key.' LIKE '.':value'.$key );
+                    $qb_count = $qb_count->andWhere( 'entity.'.$key.' LIKE '.':value'.$key );
                     $qb_count->setParameter( 'value'.$key, '%'.$value.'%' );
                 }
             }
@@ -183,10 +183,10 @@ class CommonRepository extends EntityRepository
                         $join_name[$join[0]] = $join[0];
                         $qb->join( 'entity.'.$join[0], $join[0] );
                     }
-                    $qb = $qb->orWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
+                    $qb = $qb->andWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
                     $qb->setParameter( 'value'.$join[1], '%'.$value.'%' );
                 } else {
-                    $qb = $qb->orWhere( 'entity.'.$key.' LIKE '.':value'.$key );
+                    $qb = $qb->andWhere( 'entity.'.$key.' LIKE '.':value'.$key );
                     $qb->setParameter( 'value'.$key, '%'.$value.'%' );
                 }
             }
