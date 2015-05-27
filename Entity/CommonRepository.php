@@ -9,6 +9,145 @@ class CommonRepository extends EntityRepository
 {
 
     /**
+     * Search with OR | AND conditions.
+     *
+     * You can search intro relations, for ex:
+     * entity cfUser has:
+     * username
+     * password
+     * cfPerson
+     *
+     * entity cfPerson has:
+     * firstname
+     * lastname
+     * personalId
+     *
+     * and the query by criteria:
+     *
+     * | -> OR
+     * & -> AND
+     *
+     * $criteria = [ '|username' => 'john', '&cfPerson.firstname' => 'john', '|cfPerson.personalId' => 'john' ];
+     *
+     * @param array $criteria
+     * @param $count
+     * @param array $orderBy
+     * @param null $limit
+     * @param null $offset
+     *
+     * @return array
+     */
+    public function search( array $criteria, &$count, array $orderBy = null, $limit = null, $offset = null )
+    {
+        $em = $this->getEntityManager();
+        //		$expr = $em->getExpressionBuilder();
+        //get Count
+        $qb_count = $em->createQueryBuilder();
+        $qb_count->select( 'COUNT(entity.id)' )->from( $this->getEntityName(), 'entity' );
+        if (is_array( $criteria ) && count( $criteria ) > 0) {
+            $join_name     = [ ];
+            $operation_and = false;
+            $operation_or  = false;
+            foreach ($criteria as $key => $value) {
+                //there are join?
+                //Estoy haciendo que cuando se pase una busqueda ex cfpatient.patientId se percate que tiene que hacer un join.
+                if (count( explode( '&', $key ) ) > 1) { //AND
+                    $operation_and = true;
+                    $key = explode( '&', $key )[1];
+                } else {
+                    $operation_or = true; //OR
+                    $key          = explode( '|', $key )[1];
+                }
+
+                $join = explode( '.', $key );
+                if (count( $join ) > 1) {
+                    //To verify that not exist key the same join.
+                    if ( ! array_key_exists( $join[0], $join_name )) {
+                        echo array_key_exists( $join[0], $join_name );
+                        $join_name[$join[0]] = $join[0];
+                        $qb_count->join( 'entity.'.$join[0], $join[0] );
+                    }
+                    if ($operation_and) {
+                        $qb_count = $qb_count->andWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
+                        $qb_count->setParameter( 'value'.$join[1], '%'.$value.'%' );
+                    } elseif ($operation_or) {
+                        $qb_count = $qb_count->orWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
+                        $qb_count->setParameter( 'value'.$join[1], '%'.$value.'%' );
+                    }
+                } else {
+                    if ($operation_and) {
+                        $qb_count = $qb_count->andWhere( 'entity.'.$key.' LIKE '.':value'.$key );
+                        $qb_count->setParameter( 'value'.$key, '%'.$value.'%' );
+                    } elseif ($operation_or) {
+                        $qb_count = $qb_count->orWhere( 'entity.'.$key.' LIKE '.':value'.$key );
+                        $qb_count->setParameter( 'value'.$key, '%'.$value.'%' );
+                    }
+                }
+            }
+        }
+        $count = $qb_count->getQuery()->getSingleScalarResult();
+
+        //Do Query
+        $qb = $em->createQueryBuilder();
+        $qb->select( 'entity' )->from( $this->getEntityName(), 'entity' );
+
+        if (is_array( $criteria ) && count( $criteria ) > 0) {
+            $join_name     = [ ];
+            $operation_and = false;
+            $operation_or  = false;
+            foreach ($criteria as $key => $value) {
+                //there are join?
+                //Estoy haciendo que cuando se pase una busqueda ex cfpatient.patientId se percate que tiene que hacer un join.
+                if (count( explode( '&', $key ) ) > 1) { //AND
+                    $operation_and = true;
+                    $key = explode( '&', $key )[1];
+                } else {
+                    $operation_or = true; //OR
+                    $key          = explode( '|', $key )[1];
+                }
+
+                $join = explode( '.', $key );
+                if (count( $join ) > 1) {
+                    //To verify that not exist key the same join.
+                    if ( ! array_key_exists( $join[0], $join_name )) {
+                        echo array_key_exists( $join[0], $join_name );
+                        $join_name[$join[0]] = $join[0];
+                        $qb->join( 'entity.'.$join[0], $join[0] );
+                    }
+                    if ($operation_and) {
+                        $qb = $qb->andWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
+                        $qb->setParameter( 'value'.$join[1], '%'.$value.'%' );
+                    } elseif ($operation_or) {
+                        $qb = $qb->orWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
+                        $qb->setParameter( 'value'.$join[1], '%'.$value.'%' );
+                    }
+                } else {
+                    if ($operation_and) {
+                        $qb = $qb->andWhere( 'entity.'.$key.' LIKE '.':value'.$key );
+                        $qb->setParameter( 'value'.$key, '%'.$value.'%' );
+                    } elseif ($operation_or) {
+                        $qb = $qb->orWhere( 'entity.'.$key.' LIKE '.':value'.$key );
+                        $qb->setParameter( 'value'.$key, '%'.$value.'%' );
+                    }
+                }
+            }
+        }
+        if ($orderBy !== null) {
+            $qb = $qb->orderBy( $orderBy );
+        }
+        if ($limit !== null && is_numeric( $limit )) {
+            $qb->setMaxResults( $limit );
+        }
+        if ($offset !== null && is_numeric( $offset )) {
+            $qb->setFirstResult( $offset );
+        }
+        $entities = $qb->getQuery()->getResult();
+
+        return $entities;
+    }
+
+
+    /**
      * Search with OR conditions.
      *
      * You can search intro relations, for ex:
