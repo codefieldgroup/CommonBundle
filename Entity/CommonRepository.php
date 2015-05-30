@@ -46,39 +46,49 @@ class CommonRepository extends EntityRepository
         $qb_count->select( 'COUNT(entity.id)' )->from( $this->getEntityName(), 'entity' );
         if (is_array( $criteria ) && count( $criteria ) > 0) {
             $join_name     = [ ];
-            $operation_and = false;
-            $operation_or  = false;
+            $operation_and = null;
+            $operation_or  = null;
             foreach ($criteria as $key => $value) {
                 //there are join?
                 //Estoy haciendo que cuando se pase una busqueda ex cfpatient.patientId se percate que tiene que hacer un join.
                 if (count( explode( '&', $key ) ) > 1) { //AND
                     $operation_and = true;
-                    $key = explode( '&', $key )[1];
-                } else {
-                    $operation_or = true; //OR
-                    $key          = explode( '|', $key )[1];
+                    $operation_or  = false;
+                    $key           = explode( '&', $key )[1];
+                } elseif (count( explode( '|', $key ) ) > 1) {
+                    $operation_or  = true; //OR
+                    $operation_and = false; //OR
+                    $key           = explode( '|', $key )[1];
                 }
 
-                $join = explode( '.', $key );
-                if (count( $join ) > 1) {
+                $join       = explode( '.', $key );
+                $join_count = count( $join );
+                if ($join_count > 1) {
                     //To verify that not exist key the same join.
-                    if ( ! array_key_exists( $join[0], $join_name )) {
-                        echo array_key_exists( $join[0], $join_name );
-                        $join_name[$join[0]] = $join[0];
-                        $qb_count->join( 'entity.'.$join[0], $join[0] );
+                    $i = 0;
+                    for (; $i < $join_count - 1; $i++) {
+                        if ( ! array_key_exists( $join[$i], $join_name )) {
+                            $join_name[$join[$i]] = $join[$i];
+                            if ($i === 0) {
+                                $qb_count->join( 'entity.'.$join[0], $join[0] );
+                            } else {
+                                $qb_count->join( $join[$i - 1].'.'.$join[$i], $join[$i] );
+                            }
+                        }
                     }
-                    if ($operation_and) {
-                        $qb_count = $qb_count->andWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
-                        $qb_count->setParameter( 'value'.$join[1], '%'.$value.'%' );
-                    } elseif ($operation_or) {
-                        $qb_count = $qb_count->orWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
-                        $qb_count->setParameter( 'value'.$join[1], '%'.$value.'%' );
+                    if ($operation_and === true) {
+                        $qb_count = $qb_count->andWhere( $join[$i - 1].'.'.$join[$i].' LIKE '.':valueand'.$join[$i] );
+                        $qb_count->setParameter( 'valueand'.$join[$i], '%'.$value.'%' );
+                    } elseif ($operation_or === true) {
+                        $qb_count = $qb_count->orWhere( $join[$i - 1].'.'.$join[$i].' LIKE '.':valueor'.$join[$i] );
+                        $qb_count->setParameter( 'valueor'.$join[$i], '%'.$value.'%' );
                     }
+
                 } else {
-                    if ($operation_and) {
+                    if ($operation_and === true) {
                         $qb_count = $qb_count->andWhere( 'entity.'.$key.' LIKE '.':value'.$key );
                         $qb_count->setParameter( 'value'.$key, '%'.$value.'%' );
-                    } elseif ($operation_or) {
+                    } elseif ($operation_or === true) {
                         $qb_count = $qb_count->orWhere( 'entity.'.$key.' LIKE '.':value'.$key );
                         $qb_count->setParameter( 'value'.$key, '%'.$value.'%' );
                     }
@@ -100,32 +110,42 @@ class CommonRepository extends EntityRepository
                 //Estoy haciendo que cuando se pase una busqueda ex cfpatient.patientId se percate que tiene que hacer un join.
                 if (count( explode( '&', $key ) ) > 1) { //AND
                     $operation_and = true;
-                    $key = explode( '&', $key )[1];
-                } else {
-                    $operation_or = true; //OR
-                    $key          = explode( '|', $key )[1];
+                    $operation_or  = false;
+                    $key           = explode( '&', $key )[1];
+                } elseif (count( explode( '|', $key ) ) > 1) {
+                    $operation_or  = true; //OR
+                    $operation_and = false; //OR
+                    $key           = explode( '|', $key )[1];
                 }
 
-                $join = explode( '.', $key );
-                if (count( $join ) > 1) {
+                $join       = explode( '.', $key );
+                $join_count = count( $join );
+                if ($join_count > 1) {
                     //To verify that not exist key the same join.
-                    if ( ! array_key_exists( $join[0], $join_name )) {
-                        echo array_key_exists( $join[0], $join_name );
-                        $join_name[$join[0]] = $join[0];
-                        $qb->join( 'entity.'.$join[0], $join[0] );
+                    $i = 0;
+                    for (; $i < $join_count - 1; $i++) {
+                        if ( ! array_key_exists( $join[$i], $join_name )) {
+                            $join_name[$join[$i]] = $join[$i];
+                            if ($i === 0) {
+                                $qb->join( 'entity.'.$join[0], $join[0] );
+                            } else {
+                                $qb->join( $join[$i - 1].'.'.$join[$i], $join[$i] );
+                            }
+                        }
                     }
-                    if ($operation_and) {
-                        $qb = $qb->andWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
-                        $qb->setParameter( 'value'.$join[1], '%'.$value.'%' );
-                    } elseif ($operation_or) {
-                        $qb = $qb->orWhere( $join[0].'.'.$join[1].' LIKE '.':value'.$join[1] );
-                        $qb->setParameter( 'value'.$join[1], '%'.$value.'%' );
+                    if ($operation_and === true) {
+                        $qb = $qb->andWhere( $join[$i - 1].'.'.$join[$i].' LIKE '.':valueand'.$join[$i] );
+                        $qb->setParameter( 'valueand'.$join[$i], '%'.$value.'%' );
+                    } elseif ($operation_or === true) {
+                        $qb = $qb->orWhere( $join[$i - 1].'.'.$join[$i].' LIKE '.':valueor'.$join[$i] );
+                        $qb->setParameter( 'valueor'.$join[$i], '%'.$value.'%' );
                     }
+
                 } else {
-                    if ($operation_and) {
+                    if ($operation_and === true) {
                         $qb = $qb->andWhere( 'entity.'.$key.' LIKE '.':value'.$key );
                         $qb->setParameter( 'value'.$key, '%'.$value.'%' );
-                    } elseif ($operation_or) {
+                    } elseif ($operation_or === true) {
                         $qb = $qb->orWhere( 'entity.'.$key.' LIKE '.':value'.$key );
                         $qb->setParameter( 'value'.$key, '%'.$value.'%' );
                     }
@@ -191,7 +211,6 @@ class CommonRepository extends EntityRepository
                 if (count( $join ) > 1) {
                     //To verify that not exist key the same join.
                     if ( ! array_key_exists( $join[0], $join_name )) {
-                        echo array_key_exists( $join[0], $join_name );
                         $join_name[$join[0]] = $join[0];
                         $qb_count->join( 'entity.'.$join[0], $join[0] );
                     }
@@ -222,7 +241,6 @@ class CommonRepository extends EntityRepository
                 if (count( $join ) > 1) {
                     //To verify that not exist key the same join.
                     if ( ! array_key_exists( $join[0], $join_name )) {
-                        echo array_key_exists( $join[0], $join_name );
                         $join_name[$join[0]] = $join[0];
                         $qb->join( 'entity.'.$join[0], $join[0] );
                     }
@@ -291,7 +309,6 @@ class CommonRepository extends EntityRepository
                 if (count( $join ) > 1) {
                     //To verify that not exist key the same join.
                     if ( ! array_key_exists( $join[0], $join_name )) {
-                        echo array_key_exists( $join[0], $join_name );
                         $join_name[$join[0]] = $join[0];
                         $qb_count->join( 'entity.'.$join[0], $join[0] );
                     }
@@ -318,7 +335,6 @@ class CommonRepository extends EntityRepository
                 if (count( $join ) > 1) {
                     //To verify that not exist key the same join.
                     if ( ! array_key_exists( $join[0], $join_name )) {
-                        echo array_key_exists( $join[0], $join_name );
                         $join_name[$join[0]] = $join[0];
                         $qb->join( 'entity.'.$join[0], $join[0] );
                     }
