@@ -59,6 +59,10 @@ class CommonRepository extends EntityRepository
                     $operation_or  = true; //OR
                     $operation_and = false; //OR
                     $key           = explode( '|', $key )[1];
+                }else{
+                    //By default and
+                    $operation_and = true;
+                    $operation_or  = false;
                 }
 
                 $join       = explode( '.', $key );
@@ -116,6 +120,10 @@ class CommonRepository extends EntityRepository
                     $operation_or  = true; //OR
                     $operation_and = false; //OR
                     $key           = explode( '|', $key )[1];
+                }else{
+                    //By default and
+                    $operation_and = true;
+                    $operation_or  = false;
                 }
 
                 $join       = explode( '.', $key );
