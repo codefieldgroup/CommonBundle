@@ -6,6 +6,28 @@ use \Doctrine\Common\Util\Inflector as Inflector;
 
 class MiscellaneousListener
 {
+
+    /**
+     *
+     * @param $dateBirth \DateTime Date of birth
+     * @param $currentDate \DateTime Now
+     *
+     * @return int
+     */
+    static public function calculateAge( $dateBirth, $currentDate = null )
+    {
+        if ( ! ( $dateBirth instanceof \DateTime )) {
+            return null;
+        }
+
+        if(!($currentDate instanceof \DateTime)){
+            $currentDate = new \DateTime( 'now' );
+        }
+
+
+        return $currentDate->diff( $dateBirth )->y;
+    }
+
     /**
      * @param $new
      * @param $old
