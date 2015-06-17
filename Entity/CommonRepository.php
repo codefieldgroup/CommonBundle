@@ -213,7 +213,7 @@ class CommonRepository extends EntityRepository
             }
         }
         if ($orderBy !== null) {
-            $qb = $qb->orderBy( $orderBy );
+            $qb = $qb->orderBy( 'entity.'.$orderBy[0], $orderBy[1] );
         }
         if ($limit !== null && is_numeric( $limit )) {
             $qb->setMaxResults( $limit );
