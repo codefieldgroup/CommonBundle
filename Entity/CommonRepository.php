@@ -48,7 +48,32 @@ class CommonRepository extends EntityRepository
             $join_name     = [ ];
             $operation_and = null;
             $operation_or  = null;
+            $iterator_search = 0;
             foreach ($criteria as $key => $value) {
+                //get operator <, > or =
+                $get_operator_minor = explode( '<', $key );
+                $get_operator_major = explode( '>', $key );
+                $get_operator_equal = explode( '=', $key );
+
+                $operator = 'LIKE';
+                if( is_string($value) ){
+                    $value_operator = '%'.$value.'%';
+                }
+                if (count( $get_operator_minor ) > 1) {
+                    $key      = $get_operator_minor[0];
+                    $operator = '<';
+                    $value_operator = $value;
+                } elseif (count( $get_operator_major ) > 1) {
+                    $key      = $get_operator_major[0];
+                    $operator = '>';
+                    $value_operator = $value;
+                } elseif (count( $get_operator_equal ) > 1) {
+                    $key      = $get_operator_equal[0];
+                    $operator = '=';
+                    $value_operator = $value;
+                }
+
+
                 //there are join?
                 //Estoy haciendo que cuando se pase una busqueda ex cfpatient.patientId se percate que tiene que hacer un join.
                 if (count( explode( '&', $key ) ) > 1) { //AND
@@ -59,7 +84,7 @@ class CommonRepository extends EntityRepository
                     $operation_or  = true; //OR
                     $operation_and = false; //OR
                     $key           = explode( '|', $key )[1];
-                }else{
+                } else {
                     //By default and
                     $operation_and = true;
                     $operation_or  = false;
@@ -81,23 +106,24 @@ class CommonRepository extends EntityRepository
                         }
                     }
                     if ($operation_and === true) {
-                        $qb_count = $qb_count->andWhere( $join[$i - 1].'.'.$join[$i].' LIKE '.':valueand'.$join[$i] );
-                        $qb_count->setParameter( 'valueand'.$join[$i], '%'.$value.'%' );
+                        $qb_count = $qb_count->andWhere( $join[$i - 1].'.'.$join[$i]. ' ' . $operator .' ' . ':valueand'. (string)$iterator_search.$join[$i] );
+                        $qb_count->setParameter( 'valueand'. (string)$iterator_search .$join[$i], $value_operator );
                     } elseif ($operation_or === true) {
-                        $qb_count = $qb_count->orWhere( $join[$i - 1].'.'.$join[$i].' LIKE '.':valueor'.$join[$i] );
-                        $qb_count->setParameter( 'valueor'.$join[$i], '%'.$value.'%' );
+                        $qb_count = $qb_count->orWhere( $join[$i - 1].'.'.$join[$i] . ' ' . $operator .' ' .':valueor'. (string) $iterator_search.$join[$i] );
+                        $qb_count->setParameter( 'valueor'. (string)$iterator_search .$join[$i],$value_operator );
                     }
 
                 } else {
                     if ($operation_and === true) {
-                        $qb_count = $qb_count->andWhere( 'entity.'.$key.' LIKE '.':value'.$key );
-                        $qb_count->setParameter( 'value'.$key, '%'.$value.'%' );
+                        $qb_count = $qb_count->andWhere( 'entity.'.$key. ' ' . $operator .' '.':value'. (string)$iterator_search.$key );
+                        $qb_count->setParameter( 'value'. (string) $iterator_search.$key, $value_operator );
                     } elseif ($operation_or === true) {
-                        $qb_count = $qb_count->orWhere( 'entity.'.$key.' LIKE '.':value'.$key );
-                        $qb_count->setParameter( 'value'.$key, '%'.$value.'%' );
+                        $qb_count = $qb_count->orWhere( 'entity.'.$key. ' ' . $operator .' '.':value'. (string) $iterator_search.$key );
+                        $qb_count->setParameter( 'value'. (string) $iterator_search.$key, $value_operator );
                     }
                 }
-            }
+                $iterator_search++;
+             }
         }
         $count = $qb_count->getQuery()->getSingleScalarResult();
 
@@ -107,9 +133,34 @@ class CommonRepository extends EntityRepository
 
         if (is_array( $criteria ) && count( $criteria ) > 0) {
             $join_name     = [ ];
-            $operation_and = false;
-            $operation_or  = false;
+            $operation_and = null;
+            $operation_or  = null;
+            $iterator_search = 0;
             foreach ($criteria as $key => $value) {
+                //get operator <, > or =
+                $get_operator_minor = explode( '<', $key );
+                $get_operator_major = explode( '>', $key );
+                $get_operator_equal = explode( '=', $key );
+
+                $operator = 'LIKE';
+                if( is_string($value) ){
+                    $value_operator = '%'.$value.'%';
+                }
+                if (count( $get_operator_minor ) > 1) {
+                    $key      = $get_operator_minor[0];
+                    $operator = '<';
+                    $value_operator = $value;
+                } elseif (count( $get_operator_major ) > 1) {
+                    $key      = $get_operator_major[0];
+                    $operator = '>';
+                    $value_operator = $value;
+                } elseif (count( $get_operator_equal ) > 1) {
+                    $key      = $get_operator_equal[0];
+                    $operator = '=';
+                    $value_operator = $value;
+                }
+
+
                 //there are join?
                 //Estoy haciendo que cuando se pase una busqueda ex cfpatient.patientId se percate que tiene que hacer un join.
                 if (count( explode( '&', $key ) ) > 1) { //AND
@@ -120,7 +171,7 @@ class CommonRepository extends EntityRepository
                     $operation_or  = true; //OR
                     $operation_and = false; //OR
                     $key           = explode( '|', $key )[1];
-                }else{
+                } else {
                     //By default and
                     $operation_and = true;
                     $operation_or  = false;
@@ -142,22 +193,23 @@ class CommonRepository extends EntityRepository
                         }
                     }
                     if ($operation_and === true) {
-                        $qb = $qb->andWhere( $join[$i - 1].'.'.$join[$i].' LIKE '.':valueand'.$join[$i] );
-                        $qb->setParameter( 'valueand'.$join[$i], '%'.$value.'%' );
+                        $qb = $qb->andWhere( $join[$i - 1].'.'.$join[$i]. ' ' . $operator .' ' . ':valueand'. (string)$iterator_search.$join[$i] );
+                        $qb->setParameter( 'valueand'. (string)$iterator_search .$join[$i], $value_operator );
                     } elseif ($operation_or === true) {
-                        $qb = $qb->orWhere( $join[$i - 1].'.'.$join[$i].' LIKE '.':valueor'.$join[$i] );
-                        $qb->setParameter( 'valueor'.$join[$i], '%'.$value.'%' );
+                        $qb = $qb->orWhere( $join[$i - 1].'.'.$join[$i] . ' ' . $operator .' ' .':valueor'. (string) $iterator_search.$join[$i] );
+                        $qb->setParameter( 'valueor'. (string)$iterator_search .$join[$i],$value_operator );
                     }
 
                 } else {
                     if ($operation_and === true) {
-                        $qb = $qb->andWhere( 'entity.'.$key.' LIKE '.':value'.$key );
-                        $qb->setParameter( 'value'.$key, '%'.$value.'%' );
+                        $qb = $qb->andWhere( 'entity.'.$key. ' ' . $operator .' '.':value'. (string)$iterator_search.$key );
+                        $qb->setParameter( 'value'. (string) $iterator_search.$key, $value_operator );
                     } elseif ($operation_or === true) {
-                        $qb = $qb->orWhere( 'entity.'.$key.' LIKE '.':value'.$key );
-                        $qb->setParameter( 'value'.$key, '%'.$value.'%' );
+                        $qb = $qb->orWhere( 'entity.'.$key. ' ' . $operator .' '.':value'. (string) $iterator_search.$key );
+                        $qb->setParameter( 'value'. (string) $iterator_search.$key, $value_operator );
                     }
                 }
+                $iterator_search++;
             }
         }
         if ($orderBy !== null) {
