@@ -55,8 +55,8 @@ class CommonRepository extends EntityRepository
                 $get_operator_major = explode( '>', $key );
                 $get_operator_equal = explode( '=', $key );
 
-                $operator = 'LIKE';
-                if( is_string($value) ){
+                $operator = ' LIKE ';
+                if( is_string($value) || is_numeric($value) ){
                     $value_operator = '%'.$value.'%';
                 }
                 if (count( $get_operator_minor ) > 1) {
