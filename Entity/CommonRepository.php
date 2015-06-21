@@ -3,10 +3,40 @@ namespace Cf\CommonBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
-
+use \Doctrine\Common\Util\Inflector as Inflector;
 
 class CommonRepository extends EntityRepository
 {
+
+    /**
+     * Prepare attributes for entity
+     * replace foreign keys with entity instances
+     *
+     * @param array $attributes entity attributes
+     *
+     * @return array modified attributes values
+     */
+    public function prepareAttributes( array $attributes )
+    {
+        foreach ($attributes as $fieldName => &$fieldValue) {
+
+            if ( ! $this->getClassMetadata()->hasAssociation( Inflector::camelize( $fieldName ) )) {
+                continue;
+            }
+
+            $association = $this->getClassMetadata()->getAssociationMapping( Inflector::camelize( $fieldName )  );
+
+            if ( $fieldValue === null ) {
+                continue;
+            }
+
+            $fieldValue = $this->getEntityManager()->getReference( $association['targetEntity'], $fieldValue['id'] );
+
+            unset( $fieldValue );
+        }
+
+        return $attributes;
+    }
 
     /**
      * Search with OR | AND conditions.
@@ -45,9 +75,9 @@ class CommonRepository extends EntityRepository
         $qb_count = $em->createQueryBuilder();
         $qb_count->select( 'COUNT(entity.id)' )->from( $this->getEntityName(), 'entity' );
         if (is_array( $criteria ) && count( $criteria ) > 0) {
-            $join_name     = [ ];
-            $operation_and = null;
-            $operation_or  = null;
+            $join_name       = [ ];
+            $operation_and   = null;
+            $operation_or    = null;
             $iterator_search = 0;
             foreach ($criteria as $key => $value) {
                 //get operator <, > or =
@@ -56,20 +86,20 @@ class CommonRepository extends EntityRepository
                 $get_operator_equal = explode( '=', $key );
 
                 $operator = ' LIKE ';
-                if( is_string($value) || is_numeric($value) ){
+                if (is_string( $value ) || is_numeric( $value )) {
                     $value_operator = '%'.$value.'%';
                 }
                 if (count( $get_operator_minor ) > 1) {
-                    $key      = $get_operator_minor[0];
-                    $operator = '<';
+                    $key            = $get_operator_minor[0];
+                    $operator       = '<';
                     $value_operator = $value;
                 } elseif (count( $get_operator_major ) > 1) {
-                    $key      = $get_operator_major[0];
-                    $operator = '>';
+                    $key            = $get_operator_major[0];
+                    $operator       = '>';
                     $value_operator = $value;
                 } elseif (count( $get_operator_equal ) > 1) {
-                    $key      = $get_operator_equal[0];
-                    $operator = '=';
+                    $key            = $get_operator_equal[0];
+                    $operator       = '=';
                     $value_operator = $value;
                 }
 
@@ -106,24 +136,32 @@ class CommonRepository extends EntityRepository
                         }
                     }
                     if ($operation_and === true) {
-                        $qb_count = $qb_count->andWhere( $join[$i - 1].'.'.$join[$i]. ' ' . $operator .' ' . ':valueand'. (string)$iterator_search.$join[$i] );
-                        $qb_count->setParameter( 'valueand'. (string)$iterator_search .$join[$i], $value_operator );
+                        $qb_count = $qb_count->andWhere(
+                            $join[$i - 1].'.'.$join[$i].' '.$operator.' '.':valueand'.(string) $iterator_search.$join[$i]
+                        );
+                        $qb_count->setParameter( 'valueand'.(string) $iterator_search.$join[$i], $value_operator );
                     } elseif ($operation_or === true) {
-                        $qb_count = $qb_count->orWhere( $join[$i - 1].'.'.$join[$i] . ' ' . $operator .' ' .':valueor'. (string) $iterator_search.$join[$i] );
-                        $qb_count->setParameter( 'valueor'. (string)$iterator_search .$join[$i],$value_operator );
+                        $qb_count = $qb_count->orWhere(
+                            $join[$i - 1].'.'.$join[$i].' '.$operator.' '.':valueor'.(string) $iterator_search.$join[$i]
+                        );
+                        $qb_count->setParameter( 'valueor'.(string) $iterator_search.$join[$i], $value_operator );
                     }
 
                 } else {
                     if ($operation_and === true) {
-                        $qb_count = $qb_count->andWhere( 'entity.'.$key. ' ' . $operator .' '.':value'. (string)$iterator_search.$key );
-                        $qb_count->setParameter( 'value'. (string) $iterator_search.$key, $value_operator );
+                        $qb_count = $qb_count->andWhere(
+                            'entity.'.$key.' '.$operator.' '.':value'.(string) $iterator_search.$key
+                        );
+                        $qb_count->setParameter( 'value'.(string) $iterator_search.$key, $value_operator );
                     } elseif ($operation_or === true) {
-                        $qb_count = $qb_count->orWhere( 'entity.'.$key. ' ' . $operator .' '.':value'. (string) $iterator_search.$key );
-                        $qb_count->setParameter( 'value'. (string) $iterator_search.$key, $value_operator );
+                        $qb_count = $qb_count->orWhere(
+                            'entity.'.$key.' '.$operator.' '.':value'.(string) $iterator_search.$key
+                        );
+                        $qb_count->setParameter( 'value'.(string) $iterator_search.$key, $value_operator );
                     }
                 }
                 $iterator_search++;
-             }
+            }
         }
         $count = $qb_count->getQuery()->getSingleScalarResult();
 
@@ -132,9 +170,9 @@ class CommonRepository extends EntityRepository
         $qb->select( 'entity' )->from( $this->getEntityName(), 'entity' );
 
         if (is_array( $criteria ) && count( $criteria ) > 0) {
-            $join_name     = [ ];
-            $operation_and = null;
-            $operation_or  = null;
+            $join_name       = [ ];
+            $operation_and   = null;
+            $operation_or    = null;
             $iterator_search = 0;
             foreach ($criteria as $key => $value) {
                 //get operator <, > or =
@@ -143,20 +181,20 @@ class CommonRepository extends EntityRepository
                 $get_operator_equal = explode( '=', $key );
 
                 $operator = 'LIKE';
-                if( is_string($value) ){
+                if (is_string( $value )) {
                     $value_operator = '%'.$value.'%';
                 }
                 if (count( $get_operator_minor ) > 1) {
-                    $key      = $get_operator_minor[0];
-                    $operator = '<';
+                    $key            = $get_operator_minor[0];
+                    $operator       = '<';
                     $value_operator = $value;
                 } elseif (count( $get_operator_major ) > 1) {
-                    $key      = $get_operator_major[0];
-                    $operator = '>';
+                    $key            = $get_operator_major[0];
+                    $operator       = '>';
                     $value_operator = $value;
                 } elseif (count( $get_operator_equal ) > 1) {
-                    $key      = $get_operator_equal[0];
-                    $operator = '=';
+                    $key            = $get_operator_equal[0];
+                    $operator       = '=';
                     $value_operator = $value;
                 }
 
@@ -193,20 +231,24 @@ class CommonRepository extends EntityRepository
                         }
                     }
                     if ($operation_and === true) {
-                        $qb = $qb->andWhere( $join[$i - 1].'.'.$join[$i]. ' ' . $operator .' ' . ':valueand'. (string)$iterator_search.$join[$i] );
-                        $qb->setParameter( 'valueand'. (string)$iterator_search .$join[$i], $value_operator );
+                        $qb = $qb->andWhere(
+                            $join[$i - 1].'.'.$join[$i].' '.$operator.' '.':valueand'.(string) $iterator_search.$join[$i]
+                        );
+                        $qb->setParameter( 'valueand'.(string) $iterator_search.$join[$i], $value_operator );
                     } elseif ($operation_or === true) {
-                        $qb = $qb->orWhere( $join[$i - 1].'.'.$join[$i] . ' ' . $operator .' ' .':valueor'. (string) $iterator_search.$join[$i] );
-                        $qb->setParameter( 'valueor'. (string)$iterator_search .$join[$i],$value_operator );
+                        $qb = $qb->orWhere(
+                            $join[$i - 1].'.'.$join[$i].' '.$operator.' '.':valueor'.(string) $iterator_search.$join[$i]
+                        );
+                        $qb->setParameter( 'valueor'.(string) $iterator_search.$join[$i], $value_operator );
                     }
 
                 } else {
                     if ($operation_and === true) {
-                        $qb = $qb->andWhere( 'entity.'.$key. ' ' . $operator .' '.':value'. (string)$iterator_search.$key );
-                        $qb->setParameter( 'value'. (string) $iterator_search.$key, $value_operator );
+                        $qb = $qb->andWhere( 'entity.'.$key.' '.$operator.' '.':value'.(string) $iterator_search.$key );
+                        $qb->setParameter( 'value'.(string) $iterator_search.$key, $value_operator );
                     } elseif ($operation_or === true) {
-                        $qb = $qb->orWhere( 'entity.'.$key. ' ' . $operator .' '.':value'. (string) $iterator_search.$key );
-                        $qb->setParameter( 'value'. (string) $iterator_search.$key, $value_operator );
+                        $qb = $qb->orWhere( 'entity.'.$key.' '.$operator.' '.':value'.(string) $iterator_search.$key );
+                        $qb->setParameter( 'value'.(string) $iterator_search.$key, $value_operator );
                     }
                 }
                 $iterator_search++;
