@@ -36,7 +36,8 @@ class MessengerListener
             2000 => [ 'type' => 'success', 'text' => 'Success no encontrado.' ],
             2001 => [ 'type' => 'success', 'text' => 'Creado satisfactoriamente.' ],
             2002 => [ 'type' => 'success', 'text' => 'Actualizado satisfactoriamente.' ],
-            2003 => [ 'type' => 'success', 'text' => 'Eliminado satisfactoriamente.' ]
+            2003 => [ 'type' => 'success', 'text' => 'Eliminado satisfactoriamente.' ],
+            2004 => [ 'type' => 'success', 'text' => 'Cancelado satisfactoriamente.' ]
 
         ];
     }
