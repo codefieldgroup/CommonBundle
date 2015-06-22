@@ -32,7 +32,7 @@ class MiscellaneousListener
             return null;
         }
 
-        if(!($currentDate instanceof \DateTime)){
+        if ( ! ( $currentDate instanceof \DateTime )) {
             $currentDate = new \DateTime( 'now' );
         }
 
@@ -68,6 +68,8 @@ class MiscellaneousListener
     /**
      * Merge or set array intro object.
      *
+     * Reference: http://localhost:8080/stackoverflow/20254144
+     *
      * @param $object
      * @param $arguments
      * @param bool $prepareAttributes
@@ -75,45 +77,65 @@ class MiscellaneousListener
      * @return mixed
      */
 
-    public function bindParameters( &$object, $arguments, $prepareAttributes = false)
+    public function bindParameters( &$object, $arguments, $prepareAttributes = false )
     {
-        if ($prepareAttributes !== false){
+        //This condition convert o prepared arguments(relations, so on)
+        if ($prepareAttributes !== false) {
             $em = $this->container->get( 'doctrine.orm.entity_manager' );
 
-            $arguments = $em->getRepository(get_class($object))->prepareAttributes($arguments);
+            $arguments = $em->getRepository( get_class( $object ) )->prepareAttributes( $arguments );
         }
 
         if (is_array( $arguments ) && count( $arguments ) > 0) {
             foreach ($arguments as $property => $argument) {
-                $local_function = sprintf( 'set%s', Inflector::camelize( $property ) );
+                $local_function     = sprintf( 'set%s', Inflector::camelize( $property ) );
                 $get_local_function = sprintf( 'get%s', Inflector::camelize( $property ) );
                 if (method_exists( $object, $local_function )) {
 
-                    if(is_object($object->$get_local_function())){
-                        if( $object->$get_local_function() instanceof  \DateTime && !is_object($argument)){
-                            $argument = new \DateTime($argument);
+                    if (is_string( $argument )) {   //Check if get function or $argument are DateTime Type
+                        if ($object->$get_local_function() instanceof \DateTime) {
+                            $argument = new \Datetime( $argument );
+                        } elseif ($date_parse = date_parse( $argument )) {
+                            if (array_key_exists( 'error_count', $date_parse ) && $date_parse['error_count'] === 0) {
+                                $argument = new \Datetime( $argument );
+                            }
                         }
                     }
                     $object->$local_function( $argument );
                     continue;
                 }
 
-                $local_function = sprintf( 'set%s', ucwords( $property ) );
+                $local_function     = sprintf( 'set%s', ucwords( $property ) );
+                $get_local_function = sprintf( 'get%s', ucwords( $property ) );
                 if (method_exists( $object, $local_function )) {
-                    echo $local_function;
-
+                    if (is_string( $argument )) {   //Check if get function or $argument are DateTime Type
+                        if ($object->$get_local_function() instanceof \DateTime) {
+                            $argument = new \Datetime( $argument );
+                        } elseif ($date_parse = date_parse( $argument )) {
+                            if (array_key_exists( 'error_count', $date_parse ) && $date_parse['error_count'] === 0) {
+                                $argument = new \Datetime( $argument );
+                            }
+                        }
+                    }
                     $object->$local_function( $argument );
                     continue;
                 }
 
-                $local_function = sprintf( 'set%s', $property );
+                $local_function     = sprintf( 'set%s', $property );
+                $get_local_function = sprintf( 'get%s', $property );
                 if (method_exists( $object, $local_function )) {
-                    echo $local_function;
-
+                    if (is_string( $argument )) {   //Check if get function or $argument are DateTime Type
+                        if ($object->$get_local_function() instanceof \DateTime) {
+                            $argument = new \Datetime( $argument );
+                        } elseif ($date_parse = date_parse( $argument )) {
+                            if (array_key_exists( 'error_count', $date_parse ) && $date_parse['error_count'] === 0) {
+                                $argument = new \Datetime( $argument );
+                            }
+                        }
+                    }
                     $object->$local_function( $argument );
                     continue;
                 }
-
             }
         }
 
