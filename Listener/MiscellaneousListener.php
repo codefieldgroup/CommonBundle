@@ -91,13 +91,18 @@ class MiscellaneousListener
                 $local_function     = sprintf( 'set%s', Inflector::camelize( $property ) );
                 $get_local_function = sprintf( 'get%s', Inflector::camelize( $property ) );
                 if (method_exists( $object, $local_function )) {
-
                     if (is_string( $argument )) {   //Check if get function or $argument are DateTime Type
                         if ($object->$get_local_function() instanceof \DateTime) {
                             $argument = new \Datetime( $argument );
                         } elseif ($date_parse = date_parse( $argument )) {
                             if (array_key_exists( 'error_count', $date_parse ) && $date_parse['error_count'] === 0) {
-                                $argument = new \Datetime( $argument );
+
+                                $regDate = '/(\d{4})-(\d{2})-(\d{2})/';
+                                $regTime = '/(\d{2}):(\d{2}):(\d{2})/';
+                                if (preg_match( $regDate, $argument, $result ) || preg_match( $regTime, $argument, $result )
+                                ) {
+                                    $argument = new \Datetime( $argument );
+                                }
                             }
                         }
                     }
