@@ -24,9 +24,9 @@ class CommonRepository extends EntityRepository
                 continue;
             }
 
-            $association = $this->getClassMetadata()->getAssociationMapping( Inflector::camelize( $fieldName )  );
+            $association = $this->getClassMetadata()->getAssociationMapping( Inflector::camelize( $fieldName ) );
 
-            if ( $fieldValue === null ) {
+            if ($fieldValue === null) {
                 continue;
             }
 
@@ -81,18 +81,30 @@ class CommonRepository extends EntityRepository
             $iterator_search = 0;
             foreach ($criteria as $key => $value) {
                 //get operator <, > or =
-                $get_operator_minor = explode( '<', $key );
-                $get_operator_major = explode( '>', $key );
-                $get_operator_equal = explode( '=', $key );
+                $get_operator_minor       = explode( '<', $key );
+                $get_operator_minor_equal = explode( '<=', $key );
+                $get_operator_major       = explode( '>', $key );
+                $get_operator_major_equal = explode( '>=', $key );
+                $get_operator_equal       = explode( '=', $key );
 
                 $operator = ' LIKE ';
                 if (is_string( $value ) || is_numeric( $value )) {
                     $value_operator = '%'.$value.'%';
                 }
-                if (count( $get_operator_minor ) > 1) {
+
+                if (count( $get_operator_minor_equal ) > 1) {
+                    $key            = $get_operator_minor_equal[0];
+                    $operator       = '<=';
+                    $value_operator = $value;
+                } elseif (count( $get_operator_major_equal ) > 1) {
+                    $key            = $get_operator_major_equal[0];
+                    $operator       = '>=';
+                    $value_operator = $value;
+                } elseif (count( $get_operator_minor ) > 1) {
                     $key            = $get_operator_minor[0];
                     $operator       = '<';
                     $value_operator = $value;
+
                 } elseif (count( $get_operator_major ) > 1) {
                     $key            = $get_operator_major[0];
                     $operator       = '>';
@@ -102,7 +114,6 @@ class CommonRepository extends EntityRepository
                     $operator       = '=';
                     $value_operator = $value;
                 }
-
 
                 //there are join?
                 //Estoy haciendo que cuando se pase una busqueda ex cfpatient.patientId se percate que tiene que hacer un join.
@@ -176,18 +187,30 @@ class CommonRepository extends EntityRepository
             $iterator_search = 0;
             foreach ($criteria as $key => $value) {
                 //get operator <, > or =
-                $get_operator_minor = explode( '<', $key );
-                $get_operator_major = explode( '>', $key );
-                $get_operator_equal = explode( '=', $key );
+                $get_operator_minor       = explode( '<', $key );
+                $get_operator_minor_equal = explode( '<=', $key );
+                $get_operator_major       = explode( '>', $key );
+                $get_operator_major_equal = explode( '>=', $key );
+                $get_operator_equal       = explode( '=', $key );
 
-                $operator = 'LIKE';
-                if (is_string( $value )) {
+                $operator = ' LIKE ';
+                if (is_string( $value ) || is_numeric( $value )) {
                     $value_operator = '%'.$value.'%';
                 }
-                if (count( $get_operator_minor ) > 1) {
+
+                if (count( $get_operator_minor_equal ) > 1) {
+                    $key            = $get_operator_minor_equal[0];
+                    $operator       = '<=';
+                    $value_operator = $value;
+                } elseif (count( $get_operator_major_equal ) > 1) {
+                    $key            = $get_operator_major_equal[0];
+                    $operator       = '>=';
+                    $value_operator = $value;
+                } elseif (count( $get_operator_minor ) > 1) {
                     $key            = $get_operator_minor[0];
                     $operator       = '<';
                     $value_operator = $value;
+
                 } elseif (count( $get_operator_major ) > 1) {
                     $key            = $get_operator_major[0];
                     $operator       = '>';
@@ -197,7 +220,6 @@ class CommonRepository extends EntityRepository
                     $operator       = '=';
                     $value_operator = $value;
                 }
-
 
                 //there are join?
                 //Estoy haciendo que cuando se pase una busqueda ex cfpatient.patientId se percate que tiene que hacer un join.
