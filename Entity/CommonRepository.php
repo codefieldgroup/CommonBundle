@@ -30,6 +30,10 @@ class CommonRepository extends EntityRepository
                 continue;
             }
 
+            if(is_array($fieldValue) && !array_key_exists('id', $fieldValue)){
+                    continue;
+            }
+
             if( is_string( $fieldValue)){
                 $tmp_fieldValue = json_decode($fieldValue, JSON_OBJECT_AS_ARRAY);
 
@@ -39,6 +43,7 @@ class CommonRepository extends EntityRepository
                     continue;
                 }
             }
+
             $fieldValue = $this->getEntityManager()->getReference( $association['targetEntity'], $fieldValue['id'] );
 
             unset( $fieldValue );
