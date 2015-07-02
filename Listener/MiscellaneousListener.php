@@ -97,7 +97,12 @@ class MiscellaneousListener
                         }
 
                         if ($object->$get_local_function() instanceof \DateTime) {
-                            $argument = new \Datetime( $argument );
+                            if(trim( $argument ) === ''){
+                                $argument = null;
+                            }else{
+                                $argument = new \Datetime( $argument );
+                            }
+
                         } elseif ($date_parse = date_parse( $argument )) {
                             if (array_key_exists( 'error_count', $date_parse ) && $date_parse['error_count'] === 0) {
 
