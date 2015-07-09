@@ -30,16 +30,16 @@ class CommonRepository extends EntityRepository
                 continue;
             }
 
-            if(is_array($fieldValue) && !array_key_exists('id', $fieldValue)){
-                    continue;
+            if (is_array( $fieldValue ) && ! array_key_exists( 'id', $fieldValue )) {
+                continue;
             }
 
-            if( is_string( $fieldValue)){
-                $tmp_fieldValue = json_decode($fieldValue, JSON_OBJECT_AS_ARRAY);
+            if (is_string( $fieldValue )) {
+                $tmp_fieldValue = json_decode( $fieldValue, JSON_OBJECT_AS_ARRAY );
 
-                if(array_key_exists('id', $tmp_fieldValue)){
+                if (array_key_exists( 'id', $tmp_fieldValue )) {
                     $fieldValue = $tmp_fieldValue;
-                }else{
+                } else {
                     continue;
                 }
             }
@@ -75,7 +75,7 @@ class CommonRepository extends EntityRepository
      *
      * @param array $criteria
      * @param $count
-     * @param array $orderBy
+     * @param array $orderBy Ex. [ 'dateTurn', 'DESC' ] or [ 'dateTurn', 'ASC' ]
      * @param null $limit
      * @param null $offset
      *
