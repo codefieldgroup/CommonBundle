@@ -20,6 +20,8 @@ class MessengerListener
     {
         //        $errorr = [ 'dddd' => sprintf($this,'sd'),'sdfdsf' ];
         $this->errors = [
+            /*Errors authentication*/
+            403  => [ 'type' => 'error', 'text' => 'Code(403) - Acceso denegado - Usted no cuenta con los permisos necesarios.' ],
             /*Errors from server*/
             //            500  => ['type' => 'error', 'text' => sprintf('code(500) -%s Error al establecer conexión con la Base de Datos.',$t)],
             500  => [ 'type' => 'error', 'text' => 'Code(500) - Error al establecer conexión con la Base de Datos.' ],
