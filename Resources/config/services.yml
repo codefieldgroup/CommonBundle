@@ -4,6 +4,7 @@ parameters:
 services:
     cf.commonbundle.messenger:
         class: Cf\CommonBundle\Listener\MessengerListener
+        arguments: ['@service_container']
         calls:
             - [ getError, [ @? ] ]
             - [ getSuccess, [ @? ] ]

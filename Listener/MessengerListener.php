@@ -2,9 +2,12 @@
 
 namespace Cf\CommonBundle\Listener;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class MessengerListener
 {
+    private $container;
+
     /**
      * @var array
      *
@@ -16,30 +19,39 @@ class MessengerListener
      */
     public $success;
 
-    function __construct()
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct( ContainerInterface $container )
     {
+
+        $this->container = $container;
+
         //        $errorr = [ 'dddd' => sprintf($this,'sd'),'sdfdsf' ];
         $this->errors = [
             /*Errors authentication*/
-            403  => [ 'type' => 'error', 'text' => 'Code(403) - Acceso denegado - Usted no cuenta con los permisos necesarios.' ],
+            403 => [
+                'type' => 'error',
+                'text' => 'Code(403) - Acceso denegado - Usted no cuenta con los permisos necesarios.',
+            ],
             /*Errors from server*/
             //            500  => ['type' => 'error', 'text' => sprintf('code(500) -%s Error al establecer conexión con la Base de Datos.',$t)],
-            500  => [ 'type' => 'error', 'text' => 'Code(500) - Error al establecer conexión con la Base de Datos.' ],
-            501  => [ 'type' => 'error', 'text' => 'Code(501) - Error desconocido.' ],
+            500 => ['type' => 'error', 'text' => 'Code(500) - Error al establecer conexión con la Base de Datos.'],
+            501 => ['type' => 'error', 'text' => 'Code(501) - Error desconocido.'],
             /*Specific Errors*/
-            1000 => [ 'type' => 'error', 'text' => 'Code(1000) - Error no encontrado.' ],
-            1001 => [ 'type' => 'error', 'text' => 'Code(1001) - El elemento no fue encontrado.' ],
-            1002 => [ 'type' => 'error', 'text' => 'Code(1002) - Nombre duplicado.' ],
-            1003 => [ 'type' => 'error', 'text' => 'Code(1003) - Debe especificar un nombre.' ],
-            1004 => [ 'type' => 'error', 'text' => 'Code(1004) - Debe suministrar un ID correcto.' ]
+            1000 => ['type' => 'error', 'text' => 'Code(1000) - Error no encontrado.'],
+            1001 => ['type' => 'error', 'text' => 'Code(1001) - El elemento no fue encontrado.'],
+            1002 => ['type' => 'error', 'text' => 'Code(1002) - Nombre duplicado.'],
+            1003 => ['type' => 'error', 'text' => 'Code(1003) - Debe especificar un nombre.'],
+            1004 => ['type' => 'error', 'text' => 'Code(1004) - Debe suministrar un ID correcto.'],
         ];
 
         $this->success = [
-            2000 => [ 'type' => 'success', 'text' => 'Success no encontrado.' ],
-            2001 => [ 'type' => 'success', 'text' => 'Creado satisfactoriamente.' ],
-            2002 => [ 'type' => 'success', 'text' => 'Actualizado satisfactoriamente.' ],
-            2003 => [ 'type' => 'success', 'text' => 'Eliminado satisfactoriamente.' ],
-            2004 => [ 'type' => 'success', 'text' => 'Cancelado satisfactoriamente.' ]
+            2000 => ['type' => 'success', 'text' => 'Success no encontrado.'],
+            2001 => ['type' => 'success', 'text' => 'Creado satisfactoriamente.'],
+            2002 => ['type' => 'success', 'text' => 'Actualizado satisfactoriamente.'],
+            2003 => ['type' => 'success', 'text' => 'Eliminado satisfactoriamente.'],
+            2004 => ['type' => 'success', 'text' => 'Cancelado satisfactoriamente.'],
 
         ];
     }
@@ -47,15 +59,24 @@ class MessengerListener
 
     /**
      * @param $key
+     * @param $msg
+     * @param $replaceMsg
      *
      * @return array
      */
-    public function getError( $key )
+    public function getError($key, $msg = null, $replaceMsg = false)
     {
-        if ($key !== null && array_key_exists( $key, $this->errors )) {
-            return (array) $this->errors[$key];
+        if ($key !== null && array_key_exists($key, $this->errors)) {
+            $error = (array)$this->errors[$key];
+            if ($msg !== null && $replaceMsg === false) {
+                $error['text'] = $error['text'].' '.$this->container->get('translator')->trans($msg);
+            } elseif ($msg !== null && $replaceMsg === true) {
+                $error['text'] = $this->container->get('translator')->trans($msg);
+            }
+
+            return (array)$error;
         } else {
-            return (array) $this->errors[1000];
+            return (array)$this->errors[1000];
         }
     }
 
@@ -64,12 +85,12 @@ class MessengerListener
      *
      * @return array
      */
-    public function getSuccess( $key )
+    public function getSuccess($key)
     {
-        if ($key !== null && array_key_exists( $key, $this->success )) {
-            return (array) $this->success[$key];
+        if ($key !== null && array_key_exists($key, $this->success)) {
+            return (array)$this->success[$key];
         } else {
-            return (array) $this->success[2000];
+            return (array)$this->success[2000];
         }
 
     }
@@ -79,9 +100,9 @@ class MessengerListener
      *
      * @return array
      */
-    public function parseErrorsByValidator( $errors )
+    public function parseErrorsByValidator($errors)
     {
-        if (count( $errors ) > 0) { //Exist validations errors
+        if (count($errors) > 0) { //Exist validations errors
             $msg_text = '';
             foreach ($errors as $key => $error) {
                 if ($msg_text !== '') {
@@ -91,7 +112,7 @@ class MessengerListener
                 $msg_text .= $error->getMessage();
             }
 
-            return [ 'type' => 'error', 'text' => $msg_text ];
+            return ['type' => 'error', 'text' => $msg_text];
         } else {
             return null;
         }
