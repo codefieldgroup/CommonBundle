@@ -69,7 +69,7 @@ class MessengerListener
         if ($key !== null && array_key_exists($key, $this->errors)) {
             $error = (array)$this->errors[$key];
             if ($msg !== null && $replaceMsg === false) {
-                $error['text'] = $error['text'].' '.$this->container->get('translator')->trans($msg);
+                $error['text'] = $this->container->get('translator')->trans($error['text']).' '.$this->container->get('translator')->trans($msg);
             } elseif ($msg !== null && $replaceMsg === true) {
                 $error['text'] = $this->container->get('translator')->trans($msg);
             }
