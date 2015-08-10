@@ -32,7 +32,7 @@ class MessengerListener
             /*Errors authentication*/
             403 => [
                 'type' => 'error',
-                'text' => 'Code(403) - Acceso denegado - Usted no cuenta con los permisos necesarios.',
+                'text' => 'Code(403) - Access Deny - Usted no cuenta con los permisos necesarios.',
             ],
             /*Errors from server*/
             //            500  => ['type' => 'error', 'text' => sprintf('code(500) -%s Error al establecer conexión con la Base de Datos.',$t)],
