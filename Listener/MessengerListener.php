@@ -31,8 +31,9 @@ class MessengerListener
         $this->errors = [
             /*Errors authentication*/
             403 => [
-                'type' => 'error',
-                'text' => 'Code(403) - Access Deny - Usted no cuenta con los permisos necesarios.',
+                'type' => 'notification',
+                'text' => 'code_401_access_deny',
+                'image' => '/bundles/cfsclinic/images/loading.gif',  'class_name' => 'cualquie cosa', 'itype' => 'Notificación',   'show_image' => false
             ],
             /*Errors from server*/
             //            500  => ['type' => 'error', 'text' => sprintf('code(500) -%s Error al establecer conexión con la Base de Datos.',$t)],
@@ -48,7 +49,7 @@ class MessengerListener
 
         $this->success = [
             2000 => ['type' => 'success', 'text' => 'Success no encontrado.'],
-            2001 => ['type' => 'success', 'text' => 'Creado satisfactoriamente.'],
+            2001 => ['type' => 'success', 'text' => 'Creado satisfactoriamente.', 'image' => '/bundles/cfsclinic/images/loading.gif',  'class_name' => 'cualquie cosa', 'itype' => 'Satisfactorio'],
             2002 => ['type' => 'success', 'text' => 'Actualizado satisfactoriamente.'],
             2003 => ['type' => 'success', 'text' => 'Eliminado satisfactoriamente.'],
             2004 => ['type' => 'success', 'text' => 'Cancelado satisfactoriamente.'],
@@ -68,7 +69,7 @@ class MessengerListener
     {
         if ($key !== null && array_key_exists($key, $this->errors)) {
             $error = (array)$this->errors[$key];
-            if ($msg !== null && $replaceMsg === false) {
+            if ($msg === null && $replaceMsg === false) {
                 $error['text'] = $this->container->get('translator')->trans($error['text']).' '.$this->container->get('translator')->trans($msg);
             } elseif ($msg !== null && $replaceMsg === true) {
                 $error['text'] = $this->container->get('translator')->trans($msg);
