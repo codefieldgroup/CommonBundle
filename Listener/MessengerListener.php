@@ -155,7 +155,14 @@ class MessengerListener
                 $msg_text .= $error->getMessage();
             }
 
-            return ['type' => 'error', 'text' => $msg_text];
+            return [
+                'type' => 'notification',
+                'text' => $msg_text,
+                'image' => '/bundles/cfsclinic/images/loading.gif',
+                'class_name' => 'cualquie cosa',
+                'itype' => 'Notificación',
+                'show_image' => false,
+            ];
         } else {
             return null;
         }
