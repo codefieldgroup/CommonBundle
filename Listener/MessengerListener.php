@@ -30,7 +30,7 @@ class MessengerListener
         //        $errorr = [ 'dddd' => sprintf($this,'sd'),'sdfdsf' ];
         $this->errors = [
             /*Errors authentication*/
-            403 => [
+            401 => [
                 'type' => 'notification',
                 'text' => 'code_401_access_deny',
                 'image' => '/bundles/cfsclinic/images/loading.gif',
