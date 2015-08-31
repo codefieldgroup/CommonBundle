@@ -22,7 +22,7 @@ class MessengerListener
     /**
      * @param ContainerInterface $container
      */
-    public function __construct( ContainerInterface $container )
+    public function __construct(ContainerInterface $container)
     {
 
         $this->container = $container;
@@ -33,7 +33,10 @@ class MessengerListener
             403 => [
                 'type' => 'notification',
                 'text' => 'code_401_access_deny',
-                'image' => '/bundles/cfsclinic/images/loading.gif',  'class_name' => 'cualquie cosa', 'itype' => 'Notificación',   'show_image' => false
+                'image' => '/bundles/cfsclinic/images/loading.gif',
+                'class_name' => 'cualquie cosa',
+                'itype' => 'Notificación',
+                'show_image' => false,
             ],
             /*Errors from server*/
             //            500  => ['type' => 'error', 'text' => sprintf('code(500) -%s Error al establecer conexión con la Base de Datos.',$t)],
@@ -41,15 +44,50 @@ class MessengerListener
             501 => ['type' => 'error', 'text' => 'Code(501) - Error desconocido.'],
             /*Specific Errors*/
             1000 => ['type' => 'error', 'text' => 'Code(1000) - Error no encontrado.'],
-            1001 => ['type' => 'error', 'text' => 'Code(1001) - El elemento no fue encontrado.'],
-            1002 => ['type' => 'error', 'text' => 'Code(1002) - Nombre duplicado.'],
-            1003 => ['type' => 'error', 'text' => 'Code(1003) - Debe especificar un nombre.'],
-            1004 => ['type' => 'error', 'text' => 'Code(1004) - Debe suministrar un ID correcto.'],
+            1001 => [
+                'type' => 'warning',
+                'text' => 'Code(1001) - El elemento no fue encontrado.',
+                'image' => '/bundles/cfsclinic/images/loading.gif',
+                'class_name' => 'cualquie cosa',
+                'itype' => 'Advertencia',
+                'show_image' => false,
+            ],
+            1002 => [
+                'type' => 'warning',
+                'text' => 'Code(1002) - Nombre duplicado.',
+                'image' => '/bundles/cfsclinic/images/loading.gif',
+                'class_name' => 'cualquie cosa',
+                'itype' => 'Advertencia',
+                'show_image' => false,
+            ],
+            1003 => [
+                'type' => 'warning',
+                'text' => 'Code(1003) - Debe especificar un nombre.',
+                'image' => '/bundles/cfsclinic/images/loading.gif',
+                'class_name' => 'cualquie cosa',
+                'itype' => 'Advertencia',
+                'show_image' => false,
+            ],
+            1004 => [
+                'type' => 'warning',
+                'text' => 'Code(1004) - Debe suministrar un ID correcto.',
+                'image' => '/bundles/cfsclinic/images/loading.gif',
+                'class_name' => 'cualquie cosa',
+                'itype' => 'Advertencia',
+                'show_image' => false,
+            ],
         ];
 
         $this->success = [
             2000 => ['type' => 'success', 'text' => 'Success no encontrado.'],
-            2001 => ['type' => 'success', 'text' => 'Creado satisfactoriamente.', 'image' => '/bundles/cfsclinic/images/loading.gif',  'class_name' => 'cualquie cosa', 'itype' => 'Satisfactorio'],
+            2001 => [
+                'type' => 'success',
+                'text' => 'Creado satisfactoriamente.',
+                'image' => '/bundles/cfsclinic/images/loading.gif',
+                'class_name' => 'cualquie cosa',
+                'itype' => 'Satisfactorio',
+                'show_image' => false,
+            ],
             2002 => ['type' => 'success', 'text' => 'Actualizado satisfactoriamente.'],
             2003 => ['type' => 'success', 'text' => 'Eliminado satisfactoriamente.'],
             2004 => ['type' => 'success', 'text' => 'Cancelado satisfactoriamente.'],
@@ -70,7 +108,11 @@ class MessengerListener
         if ($key !== null && array_key_exists($key, $this->errors)) {
             $error = (array)$this->errors[$key];
             if ($msg === null && $replaceMsg === false) {
-                $error['text'] = $this->container->get('translator')->trans($error['text']).' '.$this->container->get('translator')->trans($msg);
+                $error['text'] = $this->container->get('translator')->trans($error['text']);
+            } elseif ($msg !== null && $replaceMsg === false) {
+                $error['text'] = $this->container->get('translator')->trans($error['text']).' '.$this->container->get(
+                        'translator'
+                    )->trans($msg);
             } elseif ($msg !== null && $replaceMsg === true) {
                 $error['text'] = $this->container->get('translator')->trans($msg);
             }
