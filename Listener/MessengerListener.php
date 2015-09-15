@@ -90,6 +90,7 @@ class MessengerListener
             ],
             2002 => ['type' => 'success', 'text' => 'Actualizado satisfactoriamente.'],
             2003 => ['type' => 'success', 'text' => 'Eliminado satisfactoriamente.'],
+            2005 => ['type' => 'success', 'text' => 'Descontinuado satisfactoriamente.'],
             2004 => ['type' => 'success', 'text' => 'Cancelado satisfactoriamente.'],
 
         ];
